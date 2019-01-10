@@ -1,18 +1,22 @@
 import mongoose from 'mongoose';
 
-export const database = () => {
-   mongoose.connect(
-      'mongodb://auth:A123456@ds253960.mlab.com:53960/auth',
-      { useNewUrlParser: true },
-   );
+const mongooseOptions = {
+   useNewUrlParser: true,
+   useCreateIndex: true,
+   useFindAndModify: false,
+};
+
+const database = () => {
+   mongoose
+      .connect(
+         process.env.MONGO_URI,
+         mongooseOptions,
+      )
+      .then(() => console.log('DB connected'));
 
    mongoose.connection.on('error', (err) => {
-      console.log('MongoDB: Error', err);
+      console.log(`DB connection error: ${err.message}`);
    });
-
-   mongoose.connection.once('open', () => {
-      console.log('we\'re connected! ');
-   });
-
-   mongoose.Promise = global.Promise;
 };
+
+export default database;

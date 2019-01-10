@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import jwt from 'jwt-simple';
 import userSchema from '../models/user';
-import { SECRET } from '../config/secret';
 
 const router = express.Router();
 
@@ -20,7 +19,7 @@ router.post('/', (req, res) => {
    const findUser = userSchema.findOne({ email });
    findUser
       .then((data) => {
-         const token = jwt.encode(data.email, SECRET);
+         const token = jwt.encode(data.email, process.env.SECRET);
          const userData = {
             email: data.email,
             auth: 'isActive',

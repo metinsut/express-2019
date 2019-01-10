@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import expressValidator from 'express-validator';
-import { database } from './database';
-import { optionsCors } from './config/cors';
+import database from './database';
+import optionsCors from './config/cors';
 import routes from './routes';
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -38,5 +38,10 @@ app.use(express.json());
 app.use(expressValidator());
 
 app.use('/api', routes);
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+   const { status = 500, message } = err;
+   res.status(status).json(message);
+});
 
 app.listen(port, () => console.log('App is listening on port ' + ROOT_URL));
