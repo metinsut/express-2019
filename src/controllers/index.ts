@@ -1,9 +1,7 @@
-import express from 'express';
+import { Request, Response } from 'express';
 
-const router = express.Router();
-
-router.get('/', (req, res) => {
+const Home = (req: Request, res: Response) => {
    res.json({ name: 'John Doe' });
-});
+};
 
-export default router;
+export default Home;

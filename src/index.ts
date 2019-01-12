@@ -40,6 +40,7 @@ app.use(expressValidator());
 app.use('/api', routes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+   console.log('error');
    const { status = 500, message } = err;
    res.status(status).json(message);
 });

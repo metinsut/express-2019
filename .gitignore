@@ -8,6 +8,7 @@
 
 # production
 /build
+/dev
 
 # misc
 # .env
@@ -21,4 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-src/config.js
+/package-lock.json
+package-lock.json
