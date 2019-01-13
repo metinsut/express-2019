@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import expressValidator from 'express-validator';
+import passport from 'passport';
 import database from './database';
 import optionsCors from './config/cors';
 import routes from './routes';
@@ -34,8 +35,13 @@ app.use(cors(optionsCors));
 // express middleware for json body parser
 app.use(express.json());
 
+// Initialize passport
+app.use(passport.initialize());
+
 // express validator Middleware
 app.use(expressValidator());
+
+app.use(express.static('public'));
 
 app.use('/api', routes);
 

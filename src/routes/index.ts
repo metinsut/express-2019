@@ -1,11 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
+import passport = require('passport');
 import Home from '../controllers';
-import singUp from '../controllers/signUp';
-import singIn from '../controllers/signIn';
-import verifyUser from '../middleware/veriyfUser';
-import dashboard from '../controllers/dashboard';
+import passportService from '../controllers/services/index';
+import { signUp, validateSignUp } from '../controllers/auth/signUp';
+import { signIn } from '../controllers/auth/signIn';
+// import verifyUser from '../middleware/veriyfUser';
+// import dashboard from '../controllers/dashboard';
 
 const router = express.Router();
+passportService();
 
 /* Error handler for async / await functions */
 const catchErrors = (fn: any) => {
@@ -16,8 +19,8 @@ const catchErrors = (fn: any) => {
 
 router.route('/').get(Home);
 
-router.get('/signup', singUp);
-router.get('/signin', singIn);
-router.get('/dash', verifyUser, dashboard);
+router.post('/signup', validateSignUp, catchErrors(signUp));
+router.post('/signin', catchErrors(signIn));
+// router.get('/dash', verifyUser, dashboard);
 
 export default router;

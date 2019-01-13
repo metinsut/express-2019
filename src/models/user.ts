@@ -1,35 +1,66 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import { Schema, Document, model } from 'mongoose';
+import bcrypt from 'bcrypt';
+import { NextFunction } from 'express';
 
-const Schema = mongoose.Schema;
-
-export interface IUser extends mongoose.Document {
+export interface IUser extends Document {
    email: string;
+   name: string;
    password: string;
+   avatar: object;
+   about: string;
+   following: any[];
+   followers: any[];
 }
 
-export const userSchema = new Schema({
-   email: {
-      type: String,
-      unique: true,
-      lowercase: true,
-      trim: true,
-      required: true,
+const userSchema = new Schema(
+   {
+      email: {
+         type: String,
+         trim: true,
+         lowercase: true,
+         unique: true,
+         required: 'Email is required',
+      },
+      name: {
+         type: String,
+         trim: true,
+         unique: true,
+         minlength: 4,
+         maxlength: 10,
+         required: 'Name is required',
+      },
+      password: {
+         type: String,
+         trim: true,
+         minlength: 4,
+         maxlength: 20,
+         required: 'Password is required',
+      },
+      avatar: {
+         type: String,
+         required: 'Avatar image is required',
+         default: '/static/images/profile-image.jpg',
+      },
+      about: {
+         type: String,
+         trim: true,
+      },
+      /* we wrap 'following' and 'followers' in array so that when they are populated as objects,
+      they are put in an array (to more easily iterate over them) */
+      following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+      followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
    },
-   password: {
-      type: String,
-      required: true,
-   },
-});
+   /* gives us "createdAt" and "updatedAt" fields automatically */
+   { timestamps: true },
+);
 
-userSchema.pre('save', function (next) {
-   const user: any = this;
+userSchema.pre('save', function(next: NextFunction) {
+   const user = this;
    bcrypt.genSalt(10, (err, salt) => {
       if (err) {
          return next(err);
       }
-
-      bcrypt.hash(user.password, salt, (error, hash) => {
+      bcrypt.hash(user.password, salt, (error: Error, hash: any) => {
          if (error) {
             return next(error);
          }
@@ -51,5 +82,4 @@ userSchema.methods.comparePassword = (
    });
 };
 
-const User = mongoose.model<IUser>('user', userSchema);
-export default User;
+export const User = model<IUser>('user', userSchema);
