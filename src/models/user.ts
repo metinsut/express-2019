@@ -53,18 +53,16 @@ const userSchema = new Schema(
    /* gives us "createdAt" and "updatedAt" fields automatically */
    { timestamps: true },
 );
-
-userSchema.pre('save', function(next: NextFunction) {
-   const user = this;
+userSchema.pre('save', function(this: any, next: NextFunction) {
    bcrypt.genSalt(10, (err, salt) => {
       if (err) {
          return next(err);
       }
-      bcrypt.hash(user.password, salt, (error: Error, hash: any) => {
+      bcrypt.hash(this.password, salt, (error: Error, hash: any) => {
          if (error) {
             return next(error);
          }
-         user.password = hash;
+         this.password = hash;
          next();
       });
    });

@@ -1,84 +1,73 @@
 import passport from 'passport';
-import JwtStrategy from 'passport-jwt';
-import ExtractJwt from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import LocalStrategy from 'passport-local';
 import { User, IUser } from '../../models/user';
 
 const passportService = () => {
-   // JwtStrategy.Strategy();
-   // ExtractJwt.ExtractJwt();
+   passport.serializeUser<any, any>((user, done) => {
+      console.log('sssssss', user);
+      done(undefined, user._id);
+   });
 
-   // passport.serializeUser(User.serializeUser());
-   // passport.deserializeUser(User.deserializeUser());
+   passport.deserializeUser((userData, done) => {
+      User.findById(userData, (err, user) => {
+         console.log('ddddddddddd', user);
+         done(err, user._id);
+      });
+   });
 
-   // passport.serializeUser<any, any>((user, done) => {
-   //    done(undefined, user.id);
-   // });
+   const jwtOptions = {
+      jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+      secretOrKey: process.env.SECRET,
+   };
 
-   // passport.deserializeUser((id, done) => {
-   //    User.findById(id, (err, user) => {
-   //       done(err, user);
-   //    });
-   // });
-
-   // passport.serializeUser((user, done) => {
-   //    done(null, user);
-   // });
-   // passport.deserializeUser((user, done) => {
-   //    done(null, user);
-   // });
-
-   // const jwtOptions = {
-   //    jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-   //    secretOrKey: process.env.SECRET,
-   // };
-
-   // const jtwLogin = new JwtStrategy(jwtOptions, (payload, done) => {
-   //    const matchUser = User.findById(payload.sub).select('email');
-   //    console.log(payload);
-   //    matchUser
-   //       .then((user: IUser) => {
-   //          if (user) {
-   //             done(null, user);
-   //          } else {
-   //             done(null, false);
-   //          }
-   //       })
-   //       .catch((err: Error) => {
-   //          done(err, false);
-   //       });
-   // });
-
-   // const localLogin = new LocalStrategy.Strategy(User.authenticate());
-
-   // passport.use(new LocalStrategy(User.authenticate()));
+   const jtwLogin = new Strategy(jwtOptions, (payload, done) => {
+      const matchUser = User.findById(payload.sub);
+      matchUser
+         .then((user: IUser) => {
+            if (user) {
+               console.log('jwt-1');
+               done(null, user);
+            } else {
+               console.log('jwt-2');
+               done(null, false);
+            }
+         })
+         .catch((err: Error) => {
+            console.log('jwt-3');
+            done(err, false);
+         });
+   });
 
    const localOptions = {
       usernameField: 'email',
+      passwordField: 'password',
+      session: false,
    };
 
    const localLogin = new LocalStrategy.Strategy(
       localOptions,
-      (email: string, password: string, done: any) => {
-         const findUser = User.findOne({ email });
+      (username: string, password: string, done: any) => {
+         const findUser = User.findOne({ email: username });
          findUser
+            .select('id name email avatar about')
             .then((user) => {
                if (!user) {
-                  console.log('l1');
-                  return done(null, false);
+                  return done(null, false, {
+                     message: 'invalid e-mail address or password',
+                  });
                } else {
-                  console.log('l2');
                   return done(null, user);
                }
             })
             .catch((err) => {
-               console.log('l3');
                return done(null, err);
             });
       },
    );
 
    passport.use(localLogin);
+   passport.use(jtwLogin);
 };
 
 export default passportService;

@@ -27,7 +27,7 @@ const validateSignUp = (req: Request, res: Response, next: NextFunction) => {
 
    const errors = req.validationErrors();
    if (errors) {
-      const firstError = errors.map((error: Error) => error.msg)[0];
+      const firstError = errors.map((error: Error) => error)[0];
       return res.status(400).json({
          error: firstError,
          success: null,

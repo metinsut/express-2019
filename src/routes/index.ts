@@ -4,8 +4,8 @@ import Home from '../controllers';
 import passportService from '../controllers/services/index';
 import { signUp, validateSignUp } from '../controllers/auth/signUp';
 import { signIn } from '../controllers/auth/signIn';
-// import verifyUser from '../middleware/veriyfUser';
-// import dashboard from '../controllers/dashboard';
+import verifyUser from '../middleware/verifyUser';
+import dashboard from '../controllers/dashboard';
 
 const router = express.Router();
 passportService();
@@ -21,6 +21,6 @@ router.route('/').get(Home);
 
 router.post('/signup', validateSignUp, catchErrors(signUp));
 router.post('/signin', catchErrors(signIn));
-// router.get('/dash', verifyUser, dashboard);
+router.post('/dash', verifyUser, dashboard);
 
 export default router;
