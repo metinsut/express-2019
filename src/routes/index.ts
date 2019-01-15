@@ -4,6 +4,7 @@ import Home from '../controllers';
 import passportService from '../controllers/services/index';
 import { signUp, validateSignUp } from '../controllers/auth/signUp';
 import { signIn } from '../controllers/auth/signIn';
+import signOut from '../controllers/auth/signOut';
 import verifyUser from '../middleware/verifyUser';
 import dashboard from '../controllers/dashboard';
 
@@ -20,7 +21,8 @@ const catchErrors = (fn: any) => {
 router.route('/').get(Home);
 
 router.post('/signup', validateSignUp, catchErrors(signUp));
-router.post('/signin', catchErrors(signIn));
+router.post('/signin', signIn);
+router.post('/signout', signOut);
 router.post('/dash', verifyUser, dashboard);
 
 export default router;

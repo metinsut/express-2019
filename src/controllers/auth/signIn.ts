@@ -7,7 +7,7 @@ const tokenForUser = (user: any) => {
    return jtw.encode({ sub: user.id, iat: timestamp }, process.env.SECRET);
 };
 
-const signIn = async (req: Request, res: Response, next: NextFunction) => {
+const signIn = (req: Request, res: Response, next: NextFunction) => {
    passport.authenticate('local', (err, user, info) => {
       if (err) {
          return res.status(500).json({
