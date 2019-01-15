@@ -53,13 +53,11 @@ const passportService = () => {
    );
 
    passport.serializeUser<any, any>((user, done) => {
-      console.log('s', user);
       done(undefined, user);
    });
 
    passport.deserializeUser((userData, done) => {
       User.findById(userData, (err, user) => {
-         console.log('d', userData);
          done(err, user);
       });
    });

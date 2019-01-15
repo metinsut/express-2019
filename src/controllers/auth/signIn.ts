@@ -21,6 +21,7 @@ const signIn = (req: Request, res: Response, next: NextFunction) => {
             success: null,
          });
       }
+      req.user = user;
       req.logIn(user, (error: Error) => {
          if (error) {
             return res.status(500).json({
