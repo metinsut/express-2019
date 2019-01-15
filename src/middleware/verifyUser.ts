@@ -1,31 +1,26 @@
+import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 
-const verifyUser = (req: any, res: any, next: any) => {
-   console.log(req.headers.authorization);
+const verifyUser = (req: Request, res: Response, next: NextFunction) => {
    passport.authenticate('jwt', (err, user, info) => {
-      console.log(err);
-      console.log(user);
-      console.log(info);
       if (err) {
-         console.log('ver-1');
          return next(err);
       }
       if (!user) {
-         console.log('ver-2');
-         return res.json(err);
+         return res.status(401).json({
+            error: {
+               message: 'You unauthenticated, please login.',
+            },
+            success: null,
+         });
       }
-      req.logIn(user, (error: Error) => {
+      req.login(user, (error: Error) => {
          if (error) {
-            console.log('ver-3');
             return next(error);
          }
-         console.log('ver-3');
-         return next(true);
+         return next();
       });
    })(req, res, next);
 };
 
-// const requireAuth = passport.authenticate('jwt', { session: false });
-
 export default verifyUser;
-// export default requireAuth;

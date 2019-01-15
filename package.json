@@ -4,10 +4,10 @@
 	"description": "",
 	"main": "build/index.js",
 	"scripts": {
-		"start": "npm-run-all -p watch:*",
+		"start": "npm-run-all -p dev:*",
 		"build": "webpack --config webpack/webpack.prod.js",
-		"watch:ts": "webpack --config webpack/webpack.dev.js --watch",
-		"watch:node": "nodemon dev/index.js"
+		"dev:ts": "webpack --config webpack/webpack.dev.js --watch",
+		"dev:node": "nodemon dev/index.js"
 	},
 	"keywords": [],
 	"author": "Metin Süt",

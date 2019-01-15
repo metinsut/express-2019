@@ -55,7 +55,7 @@ const signUp = async (req: Request, res: Response) => {
             const saveUser = user.save();
             saveUser
                .then((userData) => {
-                  res.json({
+                  res.status(201).json({
                      error: null,
                      success: {
                         email: userData.email,

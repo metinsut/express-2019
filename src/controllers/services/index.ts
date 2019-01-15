@@ -4,17 +4,6 @@ import LocalStrategy from 'passport-local';
 import { User, IUser } from '../../models/user';
 
 const passportService = () => {
-   passport.serializeUser<any, any>((user, done) => {
-      console.log('sssssss', user);
-      done(undefined, user._id);
-   });
-
-   passport.deserializeUser((userData, done) => {
-      User.findById(userData, (err, user) => {
-         console.log('ddddddddddd', user);
-         done(err, user._id);
-      });
-   });
 
    const jwtOptions = {
       jwtFromRequest: ExtractJwt.fromHeader('authorization'),
@@ -26,15 +15,12 @@ const passportService = () => {
       matchUser
          .then((user: IUser) => {
             if (user) {
-               console.log('jwt-1');
                done(null, user);
             } else {
-               console.log('jwt-2');
                done(null, false);
             }
          })
          .catch((err: Error) => {
-            console.log('jwt-3');
             done(err, false);
          });
    });
@@ -65,6 +51,16 @@ const passportService = () => {
             });
       },
    );
+
+   passport.serializeUser<any, any>((user, done) => {
+      done(undefined, user);
+   });
+
+   passport.deserializeUser((userData, done) => {
+      User.findById(userData, (err, user) => {
+         done(err, user);
+      });
+   });
 
    passport.use(localLogin);
    passport.use(jtwLogin);

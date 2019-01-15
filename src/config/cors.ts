@@ -1,7 +1,7 @@
 const optionsCors = {
    origin: '*',
-   methods: 'POST',
-   allowedHeaders: 'X-Requested-With,content-type,x-access-token',
+   methods: 'GET POST',
+   allowedHeaders: 'X-Requested-With,content-type,authorization',
    credentials: true,
 };
 

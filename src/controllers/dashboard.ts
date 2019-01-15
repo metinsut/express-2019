@@ -1,9 +1,12 @@
-import express from 'express';
+import { Request, Response } from 'express';
 
-const router = express.Router();
+const Dashboard = (req: Request, res: Response) => {
+   res.json({
+      error: null,
+      success: {
+         title: 'Dashboard',
+      },
+   });
+};
 
-router.post('/', (req, res) => {
-   res.json({ name: 'DASHBOARD' });
-});
-
-export default router;
+export default Dashboard;
