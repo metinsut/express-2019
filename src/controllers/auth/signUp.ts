@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { User, IUser } from '../../models/user';
+import { User } from '../../models/user';
 
 const validateSignUp = (req: Request, res: Response, next: NextFunction) => {
    req.sanitizeBody('name');

@@ -15,6 +15,7 @@ const verifyUser = (req: Request, res: Response, next: NextFunction) => {
          });
       }
       req.login(user, (error: Error) => {
+         req.user = user;
          if (error) {
             return next(error);
          }

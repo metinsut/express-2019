@@ -47,7 +47,12 @@ app.use('/api', routes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
    const { status = 500, message } = err;
-   res.status(status).json(message);
+   res.status(status).json({
+      error: {
+         message,
+      },
+      success: null,
+   });
 });
 
 app.listen(port, () => console.log('App is listening on port ' + ROOT_URL));

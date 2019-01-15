@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
-import passport = require('passport');
 import Home from '../controllers';
 import passportService from '../controllers/services/index';
 import { signUp, validateSignUp } from '../controllers/auth/signUp';
 import { signIn } from '../controllers/auth/signIn';
+import { getAuthUser } from '../controllers/user';
 import signOut from '../controllers/auth/signOut';
 import verifyUser from '../middleware/verifyUser';
 import dashboard from '../controllers/dashboard';
@@ -18,11 +18,14 @@ const catchErrors = (fn: any) => {
    };
 };
 
-router.route('/').get(Home);
-
 router.post('/signup', validateSignUp, catchErrors(signUp));
 router.post('/signin', signIn);
 router.post('/signout', signOut);
+
+router.route('/').get(Home);
+
+router.post('/users/:userId', verifyUser, getAuthUser);
+
 router.post('/dash', verifyUser, dashboard);
 
 export default router;
