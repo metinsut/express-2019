@@ -8,6 +8,7 @@ export interface IUser extends Document {
    password: string;
    avatar: object;
    about: string;
+   role: object;
    following: any[];
    followers: any[];
 }
@@ -45,6 +46,23 @@ const userSchema = new Schema(
          type: String,
          trim: true,
       },
+      role: {
+         role_id: {
+            type: Number,
+            minlength: 1,
+            maxlength: 5,
+            default: 1,
+         },
+         role_name: {
+            type: String,
+            default: 'user',
+         },
+      },
+      isActive: {
+         type: Boolean,
+         default: false,
+         required: true,
+      },
       /* we wrap 'following' and 'followers' in array so that when they are populated as objects,
       they are put in an array (to more easily iterate over them) */
       following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
@@ -53,7 +71,7 @@ const userSchema = new Schema(
    /* gives us "createdAt" and "updatedAt" fields automatically */
    { timestamps: true },
 );
-userSchema.pre('save', function(this: any, next: NextFunction) {
+userSchema.pre('save', function (this: any, next: NextFunction) {
    bcrypt.genSalt(10, (err, salt) => {
       if (err) {
          return next(err);
