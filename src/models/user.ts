@@ -63,14 +63,20 @@ const userSchema = new Schema(
          default: false,
          required: true,
       },
-      /* we wrap 'following' and 'followers' in array so that when they are populated as objects,
-      they are put in an array (to more easily iterate over them) */
-      following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-      followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+      following: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+      followers: [{ type: Schema.Types.ObjectId, ref: 'user' }],
    },
-   /* gives us "createdAt" and "updatedAt" fields automatically */
    { timestamps: true },
 );
+
+const autoPopulateFollowingAndFollowers = function(next: NextFunction) {
+   this.populate('following', '_id name avatar');
+   this.populate('followers', '_id name avatar');
+   next();
+};
+
+userSchema.pre('findOne', autoPopulateFollowingAndFollowers);
+
 userSchema.pre('save', function (this: any, next: NextFunction) {
    bcrypt.genSalt(10, (err, salt) => {
       if (err) {

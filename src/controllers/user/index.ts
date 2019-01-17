@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import multer from 'multer';
 import jimp from 'jimp';
 import { User } from './../../models/user';
@@ -25,24 +26,33 @@ const getUserById = (req: Request, res: Response) => {
 };
 
 const getUserAccount = (req: Request, res: Response) => {
-   User.findOne({ _id: req.params.userId }).select('-password')
-      .then((data) => {
-         res.json({
-            error: null,
-            success: {
-               user: data,
-            },
+   if (req.user._id === req.params.userId) {
+      User.findOne({ _id: req.params.userId }).select('-password')
+         .then((data) => {
+            res.json({
+               error: null,
+               success: {
+                  user: data,
+               },
+            });
+         })
+         .catch((err) => {
+            res.json({
+               error: {
+                  message: 'You can\'t access this account.',
+                  code: err,
+               },
+               success: null,
+            });
          });
-      })
-      .catch((err) => {
-         res.json({
-            error: {
-               message: 'You can\'t access this account.',
-               code: err,
-            },
-            success: null,
-         });
+   } else {
+      res.json({
+         error: {
+            message: 'You can\'t see this user',
+         },
+         success: null,
       });
+   }
 };
 
 const avatarUploadOptions = {
@@ -75,23 +85,35 @@ const resizeAvatar = async (req: Request, res: Response, next: NextFunction) => 
 
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
    req.body.updateAt = new Date().toISOString();
-   User.findOneAndUpdate({ _id: req.user._id }, { $set: req.body }, { new: true, runValidators: true })
-      .then((data) => {
-         res.json({
-            error: null,
-            success: {
-               user: data,
-            },
+   console.log(typeof (req.user._id));
+   console.log(typeof (req.params.userId));
+   if (req.params.userId === req.user._id.toString()) {
+      User.findOneAndUpdate({ _id: req.user._id }, { $set: req.body }, { new: true, runValidators: true })
+         .then((data) => {
+            res.json({
+               error: null,
+               success: {
+                  user: data,
+               },
+            });
+         })
+         .catch((err) => {
+            res.json({
+               error: {
+                  message: err,
+               },
+               success: null,
+            });
          });
-      })
-      .catch((err) => {
-         res.json({
-            error: {
-               message: err,
-            },
-            success: null,
-         });
+   } else {
+      res.json({
+         error: {
+            message: 'You can\'t update this user',
+         },
+         success: null,
       });
+   }
+
 };
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
@@ -143,7 +165,106 @@ const deleteUser = (req: Request, res: Response) => {
          success: null,
       });
    }
-
 };
 
-export { getUserById, getUserAccount, uploadAvatar, resizeAvatar, updateUser, getUsers, deleteUser };
+const addFollowing = (req: Request, res: Response, next: NextFunction) => {
+   const { followId } = req.body;
+   User.findByIdAndUpdate({ _id: req.user._id }, { $addToSet: { following: followId } }, { new: true })
+      .then((data) => {
+         next();
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const addFollower = (req: Request, res: Response) => {
+   const { followId } = req.body;
+   User.findByIdAndUpdate(
+      { _id: followId },
+      { $addToSet: { followers: req.user._id } },
+      { new: true },
+   )
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               message: 'You have been succfuly following',
+               status: true,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const deleteFollowing = (req: Request, res: Response, next: NextFunction) => {
+   const { followId } = req.body;
+   User.findByIdAndUpdate({ _id: req.user._id }, { $pull: { following: followId } })
+      .then((data) => {
+         next();
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const deleteFollower = (req: Request, res: Response) => {
+   const { followId } = req.body;
+   User.findByIdAndUpdate(
+      { _id: followId },
+      { $pull: { followers: req.user._id } },
+      { new: true },
+   )
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               message: 'You have been successfully unfollowed',
+               status: true,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+export {
+   getUserById,
+   getUserAccount,
+   uploadAvatar,
+   resizeAvatar,
+   updateUser,
+   getUsers,
+   deleteUser,
+   addFollowing,
+   addFollower,
+   deleteFollowing,
+   deleteFollower,
+};

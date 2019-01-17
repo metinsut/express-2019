@@ -11,10 +11,13 @@ import {
    getUsers,
    getUserAccount,
    deleteUser,
+   addFollowing,
+   addFollower,
+   deleteFollower,
+   deleteFollowing,
 } from '../controllers/user';
 import signOut from '../controllers/auth/signOut';
-import verifyUser from '../middleware/verifyUser';
-import dashboard from '../controllers/dashboard';
+import verifyUser from '../controllers/middleware/verifyUser';
 
 const router = express.Router();
 passportService();
@@ -26,18 +29,18 @@ const catchErrors = (fn: any) => {
    };
 };
 
+router.get('/', Home);
+
 router.post('/signup', validateSignUp, catchErrors(signUp));
 router.post('/signin', signIn);
 router.post('/signout', signOut);
-
-router.post('/', Home);
 
 router.post('/users', verifyUser, getUsers);
 router.post('/users/profile/:userId', verifyUser, getUserById);
 router.post('/users/account/:userId', verifyUser, getUserAccount);
 router.post('/users/update/:userId', verifyUser, uploadAvatar, catchErrors(resizeAvatar), catchErrors(updateUser));
 router.post('/users/delete/:userId', verifyUser, deleteUser);
-
-router.post('/dash', verifyUser, dashboard);
+router.post('/users/follow', verifyUser, addFollowing, addFollower);
+router.post('/users/unfollow', verifyUser, deleteFollowing, deleteFollower);
 
 export default router;
