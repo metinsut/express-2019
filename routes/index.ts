@@ -15,7 +15,9 @@ import {
    addFollower,
    deleteFollower,
    deleteFollowing,
+   getUserUnFollow,
 } from '../controllers/user';
+import { getPosts, uploadImage, resizeImage, addPost, deletePost } from '../controllers/post';
 import signOut from '../controllers/auth/signOut';
 import verifyUser from '../controllers/middleware/verifyUser';
 
@@ -36,11 +38,23 @@ router.post('/signin', signIn);
 router.post('/signout', signOut);
 
 router.post('/users', verifyUser, getUsers);
+router.post('/users/getunfollow', verifyUser, getUserUnFollow);
 router.post('/users/profile/:userId', verifyUser, getUserById);
 router.post('/users/account/:userId', verifyUser, getUserAccount);
 router.post('/users/update/:userId', verifyUser, uploadAvatar, catchErrors(resizeAvatar), catchErrors(updateUser));
 router.post('/users/delete/:userId', verifyUser, deleteUser);
 router.post('/users/follow', verifyUser, addFollowing, addFollower);
 router.post('/users/unfollow', verifyUser, deleteFollowing, deleteFollower);
+
+router.post('/posts', verifyUser, getPosts);
+router.post(
+   '/posts/new/:postId',
+   verifyUser,
+   uploadImage,
+   catchErrors(resizeImage),
+   catchErrors(addPost),
+);
+
+router.post('/posts/delete/:postId', verifyUser, catchErrors(deletePost));
 
 export default router;

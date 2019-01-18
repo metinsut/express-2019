@@ -10,8 +10,11 @@
 8. Mongoose
 9. Passport
 10. Passport-local
-11. Passport-local-mongoose
+11. Passport-jwt
 12. Jwt-simple
 13. Nodemon
 14. Morgan
 15. Express-validator
+16. Bcrypt
+17. Multer
+18. Jimp

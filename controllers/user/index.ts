@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
 import multer from 'multer';
 import jimp from 'jimp';
 import { User } from './../../models/user';
@@ -55,6 +54,29 @@ const getUserAccount = (req: Request, res: Response) => {
    }
 };
 
+const getUserUnFollow = (req: Request, res: Response) => {
+   const { following } = req.user;
+   following.push(req.user._id);
+   User.find({ _id: { $nin: following } }).select('_id name avatar')
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               feeds: data,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
 const avatarUploadOptions = {
    storage: multer.memoryStorage(),
    limits: {
@@ -76,7 +98,7 @@ const resizeAvatar = async (req: Request, res: Response, next: NextFunction) => 
       return next();
    }
    const extension = req.file.mimetype.split('/')[1];
-   req.body.avatar = `./src/static/uploads/avatars/${req.user._id}/${req.user.name}-${Date.now()}.${extension}`;
+   req.body.avatar = `./static/uploads/avatars/${req.user._id}/${req.user.name}-${Date.now()}.${extension}`;
    const image = await jimp.read(req.file.buffer);
    await image.contain(250, 250);
    await image.write(`./${req.body.avatar}`);
@@ -267,4 +289,5 @@ export {
    addFollower,
    deleteFollowing,
    deleteFollower,
+   getUserUnFollow,
 };

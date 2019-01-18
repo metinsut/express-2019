@@ -7,7 +7,11 @@ export interface IPost extends Document {
    image: string;
    likes: any[];
    comments: any[];
-   postedBy: object;
+   postedBy: {
+      _id: any,
+      name: string,
+      avatar: string,
+   };
    createdAt: Date;
 }
 
