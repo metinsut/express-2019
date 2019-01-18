@@ -19,7 +19,8 @@ module.exports = merge(common, {
       new CopyWebpackPlugin([
          { from: "./static", to: "static" },
          { from: "./.env", to: "" },
-         { from: "./package.json", to: "" }
+         { from: "./package.json", to: "" },
+         { from: "./app.yaml", to: "" }
       ])
    ]
 });
