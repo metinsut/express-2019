@@ -31,7 +31,7 @@ const catchErrors = (fn: any) => {
    };
 };
 
-router.get('/', Home);
+router.post('/', Home);
 
 router.post('/signup', validateSignUp, catchErrors(signUp));
 router.post('/signin', signIn);
