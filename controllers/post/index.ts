@@ -26,7 +26,9 @@ const resizeImage = async (req: Request, res: Response, next: NextFunction) => {
    }
    const fileName = req.file.mimetype.split('/')[0];
    const extension = req.file.mimetype.split('/')[1];
-   req.body.image = `/static/uploads/posts/${req.user._id}/${fileName}-${Date.now()}.${extension}`;
+   req.body.image = `/static/uploads/posts/${
+      req.user._id
+   }/${fileName}-${Date.now()}.${extension}`;
    const image = await jimp.read(req.file.buffer);
    await image.resize(750, jimp.AUTO);
    await image.write(`./${req.body.image}`);
@@ -46,10 +48,6 @@ const addPost = async (req: Request, res: Response) => {
          post: postData,
       },
    });
-};
-
-const getPosts = () => {
-   console.log('test');
 };
 
 const deletePost = async (req: Request, res: Response) => {
@@ -84,7 +82,130 @@ const deletePost = async (req: Request, res: Response) => {
             });
          });
    }
-
 };
 
-export { getPosts, uploadImage, resizeImage, addPost, deletePost };
+const getPosts = (req: Request, res: Response) => {
+   Post.find()
+      .sort({ createdAt: 'desc' })
+      .limit(10)
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               posts: data,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const getPostsByUser = (req: Request, res: Response) => {
+   const { userId } = req.params;
+   Post.find({ postedBy: userId })
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               posts: data,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const toggleLike = async (req: Request, res: Response) => {
+   const { postId } = req.body;
+   const postOn = await Post.findOne({ _id: postId });
+   const likeIds = postOn.likes.map((id) => id.toString());
+   const authUserId = req.user._id.toString();
+   if (likeIds.includes(authUserId)) {
+      postOn.likes.pull(authUserId);
+   } else {
+      postOn.likes.push(authUserId);
+   }
+   postOn
+      .save()
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               posts: data,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+const toggleComment = async (req: Request, res: Response) => {
+   const { comment, postId } = req.body;
+   let operator;
+   let data;
+
+   if (req.url.includes('uncomment')) {
+      operator = '$pull';
+      data = { _id: comment._id };
+   } else {
+      operator = '$push';
+      data = { text: comment.text, postedBy: req.user._id };
+   }
+
+   Post.findOneAndUpdate(
+      { _id: postId },
+      { [operator]: { comments: data } },
+      { new: true },
+   )
+      .populate('postedBy', '_id name avatar')
+      .populate('comments.postedBy', '_id name avatar')
+      .then((data) => {
+         res.json({
+            error: null,
+            success: {
+               posts: data,
+            },
+         });
+      })
+      .catch((err) => {
+         res.json({
+            error: {
+               message: 'Error',
+               error: err,
+            },
+            success: null,
+         });
+      });
+};
+
+export {
+   getPosts,
+   uploadImage,
+   resizeImage,
+   addPost,
+   deletePost,
+   getPostsByUser,
+   toggleLike,
+   toggleComment,
+};
