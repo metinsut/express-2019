@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Home from '../controllers/Home/home';
-import passportService from '../controllers/services/index';
+import passportService from '../controllers/middleware/passport';
 import { signUp, validateSignUp } from '../controllers/auth/signUp';
 import { signIn } from '../controllers/auth/signIn';
 import {

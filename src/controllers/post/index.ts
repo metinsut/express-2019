@@ -132,7 +132,7 @@ const getPostsByUser = (req: Request, res: Response) => {
 const toggleLike = async (req: Request, res: Response) => {
    const { postId } = req.body;
    const postOn = await Post.findOne({ _id: postId });
-   const likeIds = postOn.likes.map((id) => id.toString());
+   const likeIds = postOn.likes.map((id:any) => id.toString());
    const authUserId = req.user._id.toString();
    if (likeIds.includes(authUserId)) {
       postOn.likes.pull(authUserId);
